@@ -20,7 +20,7 @@ namespace QuestionnaireAppLibirary.Models
 
         public CategoryModel Category { get; set; }
 
-        public String Author { get; set; }
+        public BasicUserModal Author { get; set; }
 
         public HashSet<string> UserVotes { get; set; } = new();
 

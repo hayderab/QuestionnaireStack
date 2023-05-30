@@ -16,8 +16,8 @@ namespace QuestionnaireAppLibirary.Models
 
         public string? Email { get; set; }
 
-        public List<QuestionnaireModel> AuthoredQuestionnaire { get; set; } = new();
-        public List<QuestionnaireModel> VotedOnQuestionnaire { get; set; } = new();
+        public List<BasicQuestionnaireModel> AuthoredQuestionnaire { get; set; } = new();
+        public List<BasicQuestionnaireModel> VotedOnQuestionnaire { get; set; } = new();
 
 
     }
