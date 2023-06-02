@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace QuestionnaireAppLibirary.DataAccess;
 
-public class Dbconnection
+public class Dbconnection : IDbconnection
 {
 
     private readonly IConfiguration _config;
@@ -13,14 +13,11 @@ public class Dbconnection
 
 
     public string DbName { get; private set; }
-
     public string CategoryCollectionName { get; private set; } = "catergories";
-
     public string StatusCollectionName { get; private set; } = "status";
-
     public string UserCollectionName { get; private set; } = "user";
-
     public string QuestionnaireCollectionName { get; private set; } = "questionnaire";
+    public string QuestionCollectionName { get; private set; } = "questions";
 
 
 
@@ -31,6 +28,9 @@ public class Dbconnection
     public IMongoCollection<StatusModal> StatusCollection { get; private set; }
     public IMongoCollection<QuestionnaireModel> QuestionnaireCollection { get; private set; }
     public IMongoCollection<UserModal> UserCollection { get; private set; }
+
+
+    public IMongoCollection<QuestionModel> QuestionCollection { get; private set; }
 
 
     // constructor
@@ -47,6 +47,7 @@ public class Dbconnection
         StatusCollection = _db.GetCollection<StatusModal>(StatusCollectionName);
         QuestionnaireCollection = _db.GetCollection<QuestionnaireModel>(QuestionnaireCollectionName);
         UserCollection = _db.GetCollection<UserModal>(UserCollectionName);
+        QuestionCollection = _db.GetCollection<QuestionModel>(QuestionCollectionName);
     }
 
 
@@ -54,3 +55,4 @@ public class Dbconnection
 
 
 }
+ 

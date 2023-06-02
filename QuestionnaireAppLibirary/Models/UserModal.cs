@@ -1,10 +1,13 @@
 ﻿
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace QuestionnaireAppLibirary.Models
 {
     public class UserModal
     {
-
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
          public string ObjectIndentifier { get; set; }
 

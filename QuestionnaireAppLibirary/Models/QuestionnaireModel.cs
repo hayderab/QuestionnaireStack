@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +9,15 @@ namespace QuestionnaireAppLibirary.Models
 {
     public  class QuestionnaireModel
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-        public string StatusDesc { get; set; }
+        public string QuestionnaireTitle { get; set; }
 
         public string QuestionnaireDesc { get; set;}
 
-        public string QuestionId { get; set; }
-
-
+         
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         public CategoryModel Category { get; set; }
@@ -35,15 +37,11 @@ namespace QuestionnaireAppLibirary.Models
 
         public bool Rejected { get; set; } = false;
 
+        public List<BasicQuestionnaireModel> VotedOnQuestionnaire { get; set; } = new();
 
+        public List<BasicQuestionnaireModel> AuthoredQuestionnaire { get; set; } = new();
 
-
-
-
-
-
-
-
+        public List<QuestionModel> Questions { get; set; } = new List<QuestionModel>();
 
     }
 }

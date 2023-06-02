@@ -10,6 +10,12 @@
 
             // caching 
             builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<IDbconnection, Dbconnection>();
+            builder.Services.AddSingleton<ICategoryData, MongoCategoryData>();
+            builder.Services.AddSingleton<IStatusData, MongoStatusData>();
+            builder.Services.AddSingleton<IUserData, MongoUserData>();
+
+
 
         }
     }
