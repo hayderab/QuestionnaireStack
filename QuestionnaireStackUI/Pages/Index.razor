@@ -9,9 +9,88 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>React Questionnaire</h1>
+<div>
+    <button>Questionnaire</button>
+</div>
 
-Welcome to your new app.
+<div>
+    <div> @questionnaire?.Count Questionnaire</div>
+    <div> 
+        <button class=""
+        @onclick="(() => OrderByNew(true))">New</button>
+        <button @onclick="(() => OrderByNew(false))">Popular</button>
+    </div>
+    <div>
+        <input type="text" placeholder="Search" 
+         aria-label="Search Box"
+         @oninput="((txt) => onSearchInput((string)txt.Value))" />
+    </div>
+</div>
+
+
+
+<div class="flex justify-centent items-center">
+    <div class="w-3/5">
+        @if(questionnaire is not null)
+        {
+            <Virtualize Items="@questionnaire" Context="item" OverscanCount="10">
+
+                <div>
+                    <div>
+                        <div>@GetUpVoteTopText(item)</div>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                            </svg>
+
+                        </span>
+                        <div> @GetUpVoteBottomText(item)</div>
+                        <div>
+                            <div @onclick="(() => OpenDetails(item))">
+                                @item.QuestionnaireTitle
+                            </div>
+                            <div @onclick="(()=> OpenDetails(item))">
+                                @item.Category?.CategoryName
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                @item.QuestionnaireStatus?.StatusName
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Virtualize>
+        }
+    </div>
+
+    <div>
+        @if (categories is not null)
+        {
+            <div>Category </div>
+            <div @onclick="(() => OnCategoryClick())" > All  </div>
+            @foreach(var c in categories)
+            {
+                <div  @onclick="(() => OnCategoryClick(c.CategoryName))">
+                    @c.CategoryName
+                </div>
+            }
+        }
+
+        @if (statuses is not null)
+        {
+            <div>Status </div>
+            <div @onclick="(() => OnStatusClick())"> All  </div>
+            @foreach (var s in statuses)
+            {
+                <div @onclick="(() => OnStatusClick(s.StatusName))">
+                    @s.StatusName
+                </div>
+            }
+        }
+    </div>
+</div>
 
 @code{
     private List<QuestionnaireModel> questionnaire; 
@@ -159,7 +238,7 @@ Welcome to your new app.
         }
     }
 
-    private void OpenDetails(BasicQuestionnaireModel questionnaire)
+    private void OpenDetails(QuestionnaireModel questionnaire)
     {
         navManager.NavigateTo($"/Details/{questionnaire.Id}");
     }
