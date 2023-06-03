@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuestionnaireAppLibirary.DataAccess
 {
-    public class MongoQuestionnaireData : IMongoQuestionnaireData
+    public class MongoQuestionnaireData : IQuestionnaireData
     {
         private readonly IDbconnection _db;
         private readonly IUserData _userData;
@@ -136,6 +136,9 @@ namespace QuestionnaireAppLibirary.DataAccess
             {
                 var db = client.GetDatabase(_db.DbName);
                 var questionnaireInTransaction = db.GetCollection<QuestionnaireModel>(_db.QuestionnaireCollectionName);
+
+                //questionnaire.Questions = questions;
+
                 await questionnaireInTransaction.InsertOneAsync(questionnaire);
 
 

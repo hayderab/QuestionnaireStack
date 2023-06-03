@@ -24,7 +24,6 @@ namespace QuestionnaireAppLibirary.DataAccess
             _questions = db.QuestionCollection; 
         }
 
-
         public async Task<List<QuestionModel>> GetAllQuestions()
         {
             var output = _cache.Get<List<QuestionModel>>(CacheName); 
@@ -35,18 +34,6 @@ namespace QuestionnaireAppLibirary.DataAccess
             }
             return output;
         }
-
-        public async Task<QuestionModel> CreateQuestions(QuestionModel question)
-        {
-
-            var output  = await _questions.
-            return null; 
-        }
-  
-
-
-   
-
 
     }
 }

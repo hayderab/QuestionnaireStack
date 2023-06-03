@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,11 @@ namespace QuestionnaireAppLibirary.Models
 {
     public class CategoryModel
     {
-        public int CategoryId { get; set; }
-        public string? CategoryName { get; set; }
-        public string? CategoryDescription { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string CategoryName { get; set; }
+        public string CategoryDescription { get; set; }
 
 
 

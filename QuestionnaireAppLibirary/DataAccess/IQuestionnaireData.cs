@@ -1,6 +1,6 @@
 ﻿namespace QuestionnaireAppLibirary.DataAccess
 {
-    public interface IMongoQuestionnaireData
+    public interface IQuestionnaireData
     {
         Task CreateQuestionnaire(QuestionnaireModel questionnaire);
         Task<List<QuestionnaireModel>> GetAllApprovedQuestionnaire();

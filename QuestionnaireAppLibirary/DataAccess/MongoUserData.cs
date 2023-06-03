@@ -33,7 +33,7 @@ namespace QuestionnaireAppLibirary.DataAccess
         // getting object id for authentication
         public async Task<UserModal> GetUserFromAuthentication(string objectId)
         {
-            var results = await _users.FindAsync(u => u.Id == objectId);
+            var results = await _users.FindAsync(u => u.ObjectIndentifier == objectId);
             return results.FirstOrDefault();
         }
 
