@@ -21,4 +21,8 @@
     <ProjectReference Include="..\QuestionnaireAppLibirary\QuestionnaireAppLibirary.csproj" />
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="npx tailwindcss -i .\Styles\app.css -o .\wwwroot\css\app.css --watch" />
+  </Target>
+
 </Project>

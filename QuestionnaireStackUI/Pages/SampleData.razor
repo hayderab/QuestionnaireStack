@@ -1,0 +1,258 @@
+﻿
+@page "/SampleData"
+@inject ICategoryData categoryData
+@inject IStatusData statusData
+@inject IUserData userData
+@inject IQuestionnaireData questionnaireData;
+
+<h3>SampleData</h3>
+
+@if (categoriesCreated)
+{
+    <h4> The categories have been created</h4>
+} else {
+    <button class="bg-blue-300 rounded-md p-3 shadow-sm" @onclick="CreateCategories"> Create Categories  </button>
+
+}
+
+@if (statusCreated)
+{
+    <h4> The categories have been created</h4>
+}
+else
+{
+    <button class="bg-blue-300 rounded-md p-3 shadow-md" @onclick="CreateStatus"> Create Statuses  </button>
+
+}
+
+<button class="bg-red-200 rounded-md m-2 p2 shadow-md" @onclick="GenerateSampleData">GenerateSampleData</button>
+
+@code {
+    private bool categoriesCreated = false; 
+    private bool statusCreated = false;
+
+
+    private async Task GenerateSampleData()
+    {
+        UserModal user = new()
+        {
+            FirstName = "tester", 
+            Lastname = "tester01", 
+            Email  = "tester@gamil.com", 
+            DisplayName = "notTheTester", 
+            ObjectIndentifier = "abc-123"
+        }; 
+        await userData.CreateUser(user);
+
+        var foundUser = await userData.GetUserFromAuthentication("abc-123");
+        var categoreis = await categoryData.GetAllCategories(); 
+        var statuses = await statusData.GetAllStatus();
+
+        // React components
+        List<QuestionModel> questions = new List<QuestionModel>
+        {
+            // Question 1
+            new QuestionModel
+            {
+                Question = "What is the purpose of the useState hook in React?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "To handle state in functional components" },
+                    new OptionModel { Option = "To handle side effects in functional components" },
+                    new OptionModel { Option = "To handle lifecycle methods in class components" },
+                    new OptionModel { Option = "To handle form submissions in React" }
+                },
+                CorrectAnswerIndex = 0
+            },
+
+            // Question 2
+            new QuestionModel
+            {
+                Question = "How does the useEffect hook work in React?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "It runs after every render of the component" },
+                    new OptionModel { Option = "It runs only once when the component mounts" },
+                    new OptionModel { Option = "It runs only when specific dependencies change" },
+                    new OptionModel { Option = "It runs before the component unmounts" }
+                },
+                CorrectAnswerIndex = 2
+            },
+
+            // Question 3
+            new QuestionModel
+            {
+                Question = "What is the purpose of the useContext hook in React?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "To handle state in functional components" },
+                    new OptionModel { Option = "To handle side effects in functional components" },
+                    new OptionModel { Option = "To access context values in functional components" },
+                    new OptionModel { Option = "To handle form submissions in React" }
+                },
+                CorrectAnswerIndex = 2
+            }
+        };
+        HashSet<string> votes = new();
+        votes.Add("1");
+        votes.Add("2");
+        votes.Add("3");
+        // Meachine Learing 
+        List<QuestionModel> questionsLinearRegression = new List<QuestionModel>
+        {
+            // Question 1
+            new QuestionModel
+            {
+                Question = "What is Linear Regression?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "A classification algorithm" },
+                    new OptionModel { Option = "A clustering algorithm" },
+                    new OptionModel { Option = "A regression algorithm" },
+                    new OptionModel { Option = "An unsupervised learning algorithm" }
+                },
+                CorrectAnswerIndex = 2
+            },
+
+            // Question 2
+            new QuestionModel
+            {
+                Question = "What is the goal of Linear Regression?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "To predict categorical outcomes" },
+                    new OptionModel { Option = "To find clusters in the data" },
+                    new OptionModel { Option = "To find the best fit line for continuous data" },
+                    new OptionModel { Option = "To perform feature selection" }
+                },
+                CorrectAnswerIndex = 2
+            },
+
+            // Question 3
+            new QuestionModel
+            {
+                Question = "How is the best fit line determined in Linear Regression?",
+                Options = new List<OptionModel>
+                {
+                    new OptionModel { Option = "By minimizing the sum of squared errors" },
+                    new OptionModel { Option = "By maximizing the likelihood function" },
+                    new OptionModel { Option = "By using the K-means clustering algorithm" },
+                    new OptionModel { Option = "By using the gradient descent algorithm" }
+                },
+                CorrectAnswerIndex = 0
+            }
+        };
+
+
+        QuestionnaireModel questionnaire = new()
+            {
+                Author = new BasicUserModal(foundUser),
+                QuestionnaireTitle = "React components",
+                Category = categoreis[1], 
+                QuestionnaireDesc = "This will test your knowledge on different React components",
+                Questions = questions, 
+                UserVotes = votes
+            };
+        await questionnaireData.CreateQuestionnaire(questionnaire);
+
+        questionnaire = new ()
+            {
+                Author = new BasicUserModal(foundUser),
+                QuestionnaireTitle = "Meachine Learin",
+                Category = categoreis[2],
+                QuestionnaireDesc = "This will test your knowledge on linear Regression",
+                Questions = questionsLinearRegression, 
+                QuestionnaireStatus = statuses[1],
+            };
+        await questionnaireData.CreateQuestionnaire(questionnaire);
+
+    }
+
+    private async Task  CreateCategories()
+    {
+        var categories = await categoryData.GetAllCategories(); 
+
+        if (categories?.Count > 0)
+        {
+            return; 
+        }
+
+        CategoryModel cat = new()
+            {
+                CategoryName = "React",
+                CategoryDescription = "Question on React components"
+            };
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "AI",
+                CategoryDescription = "Neural Networkss"
+            };
+        await categoryData.CreateCategory(cat);
+
+
+        cat = new()
+            {
+                CategoryName = "Meachine Learing",
+                CategoryDescription = "Linear Regression"
+            };
+        await categoryData.CreateCategory(cat);
+
+
+        cat = new()
+            {
+                CategoryName = "Other",
+                CategoryDescription = "Not sure which category it goes in"
+            };
+        await categoryData.CreateCategory(cat);
+
+        categoriesCreated = true;
+    }
+
+
+    private async Task CreateStatus()
+    {
+        var status = await statusData.GetAllStatus();
+
+        if  (status?.Count > 0)
+        {
+            return;
+        }
+
+        StatusModal stat = new()
+        {
+            StatusName = "Completed", 
+            StatusDescription = "The questionnare was accespted and the correspndiented questionnaire was created"
+        };
+        await statusData.CreateStatus(stat);
+        stat = new()
+            {
+                StatusName = "watching",
+                StatusDescription = "The questionnare was accespted and the correspndiented questionnaire was created"
+            };
+        await statusData.CreateStatus(stat);
+        stat = new()
+            {
+                StatusName = "Upcoming",
+                StatusDescription = "Comming Soon"
+            };
+        await statusData.CreateStatus(stat);
+        stat = new()
+            {
+                StatusName = "Dismissed",
+                StatusDescription = "Your questionnarie has been dismissed, you can resend the request."
+            };
+        await statusData.CreateStatus(stat);
+
+        statusCreated = true;
+
+
+    }
+
+
+
+
+
+}
+

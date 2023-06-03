@@ -14,6 +14,9 @@
             builder.Services.AddSingleton<ICategoryData, MongoCategoryData>();
             builder.Services.AddSingleton<IStatusData, MongoStatusData>();
             builder.Services.AddSingleton<IUserData, MongoUserData>();
+            builder.Services.AddSingleton<IQuestionnaireData, MongoQuestionnaireData>();
+
+
 
 
 
