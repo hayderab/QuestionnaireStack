@@ -139,13 +139,12 @@
     }
 
     private async Task SaveFilterState()
-    {
-        await sessionStorage.SetAsync(nameof(selectedCategory), selectedCategory);
-        await sessionStorage.SetAsync(nameof(selectedCategory), selectedStatus);
-        await sessionStorage.SetAsync(nameof(selectedCategory), searchText);
-        await sessionStorage.SetAsync(nameof(selectedCategory), isSortedByNew);
-
-    }
+{
+    await sessionStorage.SetAsync(nameof(selectedCategory), selectedCategory);
+    await sessionStorage.SetAsync(nameof(selectedStatus), selectedStatus);
+    await sessionStorage.SetAsync(nameof(searchText), searchText);
+    await sessionStorage.SetAsync(nameof(isSortedByNew), isSortedByNew);
+}
 
     private async Task FilterQuestionnaire()
     {
