@@ -1,0 +1,184 @@
+﻿@page "/Create"
+@using QuestionnaireStackUI.Components
+@using QuestionnaireStackUI.Models;
+@inject ICategoryData categoryData
+@inject IQuestionnaireData questionnaireData
+@inject IUserData userData
+@inject NavigationManager navManager
+
+
+<h3>Create Questionnaire</h3>
+<div> 
+    <div> 
+        <div>
+            <button @onclick="ClosePage"> Close Page</button>
+        </div>
+        @if(categories is not null)
+        {
+           <EditForm Model="questionnaire">
+               <DataAnnotationsValidator/>
+               <ValidationSummary/>
+               <div>
+                    <lable for="questionnaire-text">Questionnaire</lable>
+                   <div>Test your knowledge on Different Subjects</div>
+                   <InputText id="questionnaire-text" @bind-Value="questionnaire.QuestionnaireTitle"> </InputText>
+               </div>
+               <div>
+                    <lable for="category">Category</lable>
+                    <div>Choose one Category</div>
+                    <div>
+                        <MyInputRadioGroup id="category" @bind-Value="questionnaire.CategoryId">
+                        @foreach(var c in categories)
+                        {
+                            <div>
+
+                                <InputRadio Value="@c.Id" id="@c.Id"/>
+                                <labe for="@c.Id"   > @c.CategoryName - @c.CategoryDescription</labe>
+
+                             </div>
+                        }
+                       </MyInputRadioGroup>
+                    </div>
+               </div>
+                <div>
+                    <lable for="questionnaire-desc">Description</lable>
+                    <div>Provide brief description about your questionnaire</div>
+                    <InputTextArea id="questionnaire-desc" @bind-Value="questionnaire.QuestionnaireDesc"> </InputTextArea>
+                </div>
+                <div>
+                    <label for="question">Question</label>
+                    <input type="text" @bind="question.Question" />
+                    @foreach (var option in question.Options)
+                    {
+                        <div>@option.Option </div>
+                    }
+
+                    <label for="question">Options</label>
+                    <input type="text" @bind="option" />
+                    <button @onclick="AddOption">Add Option</button>
+
+                    @if(question.Options.Count == 4)
+                    {
+                    <button @onclick="AddQuestion">Add Question</button>
+                    }
+                    @foreach (var q in questions)
+                    {
+                        <h4>@q.Question</h4>
+                        @foreach (var option in q.Options)
+                        {
+                            <p>@option.Option</p>
+                        }
+                    }
+
+                    <button @onclick="SubmitQuestions">Submit Questions</button>
+
+
+                </div>
+                <div> 
+                    <button type="submit" @onclick="CreateQuestionnaireData"> Create Questionnaire</button>
+                </div>
+           </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+
+    private CreateQuestionnaireModel questionnaire = new();
+
+    //private List<QuestionModel> questions; 
+
+    private List<CategoryModel> categories;
+    private QuestionModel question = new QuestionModel();
+    private UserModal loggedInUser;
+    private string option;
+
+
+
+    private List<QuestionModel> questions = new List<QuestionModel>();
+
+    private void AddOption()
+    {
+        if (!string.IsNullOrEmpty(option))
+        {
+            question.Options.Add(new OptionModel { Option = option });
+            option = string.Empty;
+        }
+    }
+
+
+    private void AddQuestion()
+    {
+        questions.Add(new QuestionModel
+            {
+                Question = question.Question,
+                Options = question.Options.ToList(),
+                CorrectAnswerIndex = 0 // Set the correct answer index as needed
+            });
+
+        question = new QuestionModel();
+    }
+
+
+
+
+    private void SubmitQuestions()
+    {
+        // Perform any necessary operations with the submitted questions
+        // ...
+        foreach (var q in questions)
+        {
+            Console.WriteLine("Question: " + q.Question);
+            Console.WriteLine("Options:");
+            foreach (var option in q.Options)
+            {
+                Console.WriteLine(option.Option);
+            }
+            Console.WriteLine();
+        }
+
+        // Clear the questions list after submission
+        questions.Clear();
+    }
+
+
+
+
+    protected  async override Task OnInitializedAsync()
+    {
+        categories = await categoryData.GetAllCategories();
+
+        //TODO - Replace with user lookup
+        loggedInUser = await userData.GetUserFromAuthentication("abc-123");
+
+    }
+
+    private void ClosePage()
+    {
+        navManager.NavigateTo("/");
+    }
+
+
+    private async Task CreateQuestionnaireData()
+    {
+        QuestionnaireModel s = new();
+        s.QuestionnaireTitle = questionnaire.QuestionnaireTitle;
+        s.QuestionnaireDesc = questionnaire.QuestionnaireDesc; 
+        s.Author = new BasicUserModal(loggedInUser); 
+        s.Category = categories.Where(c => c.Id == questionnaire.CategoryId).FirstOrDefault();
+        s.Questions.AddRange(questions);
+
+        if(s.Category is null)
+        {
+            questionnaire.CategoryId = ""; 
+            return ;
+        }
+        await questionnaireData.CreateQuestionnaire(s);
+        questionnaire = new(); 
+        ClosePage();
+
+    }
+
+
+
+}

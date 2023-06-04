@@ -1,0 +1,114 @@
+﻿@page "/Details/{Id}"
+@inject IQuestionnaireData questionnaireData
+@inject NavigationManager navManager
+<h3>Questionnaire Details</h3>
+<div> 
+    <div> 
+        @if(questionnaire is not null && questionnaire.Questions is not null)
+        {
+            <div>
+                <div>
+                    <div>
+                        <div>@GetUpVoteTopText()</div>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                            </svg>
+                        </span>
+                        <div> @GetUpVoteBottomText()</div>
+                    </div>
+                    <div>
+                        <div> @questionnaire.DateCreated.ToString("MM.dd.yyyy" )</div>
+                    </div>
+                </div>
+                <div>
+                        <div>@questionnaire.QuestionnaireTitle <div>
+                        <div>@questionnaire.Author.DisplayName</div>
+                        <div>@questionnaire.QuestionnaireDesc</div>
+                        <div>@questionnaire.Category.CategoryName</div>
+                    </div>
+                </div>
+            </div> 
+                <div> @foreach(var question in questionnaire.Questions)
+                    {
+                      <div> @question.Question</div>
+                        @foreach (var option in question.Options)
+                        {
+                            <div>@option.Option</div>
+
+                        }
+                    }
+                </div>
+            
+               <div> 
+                   <button @onclick="ClosePage">Close Page </button>
+               </div>
+            
+            </div>
+        }
+
+    </div>
+</div>
+
+@if(questionnaire?.QuestionnaireStatus is not null)
+{
+    <div>
+        <div>
+            <div>
+
+            </div>
+            <div> 
+                <div>
+                    @questionnaire.QuestionnaireStatus.StatusName
+                </div>
+                <div>
+                    @((MarkupString)questionnaire.OwnerNotes);
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private QuestionnaireModel questionnaire;
+
+    protected async override Task OnInitializedAsync()
+    {
+        questionnaire = await questionnaireData.GetQuestionnaire(Id);
+    }
+
+    private void ClosePage()
+    {
+        navManager.NavigateTo("/"); 
+    }
+
+
+    private string GetUpVoteTopText()
+    {
+        if (questionnaire.UserVotes.Count > 0)
+        {
+            return questionnaire.UserVotes.Count.ToString("00");
+        }
+        else
+        {
+            return "Click To";
+        }
+    }
+
+    private string GetUpVoteBottomText()
+    {
+        if (questionnaire.UserVotes.Count > 1)
+        {
+            return "Upvotes";
+        }
+        else
+        {
+            return "Upvote";
+        }
+    }
+
+
+
+}
