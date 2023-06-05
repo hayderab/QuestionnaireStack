@@ -1,0 +1,176 @@
+﻿@page "/Profile"
+@inject IQuestionnaireData questionnnaireData
+@inject IUserData userData
+@inject NavigationManager navManager
+
+
+<h1>Profile</h1>
+
+<div>
+    <div>
+        <button @onclick="ClosePage"> Close Page</button>
+    </div>
+</div>
+
+<div> 
+    <h2> My Account </h2>
+    <p>
+        <a href="#">Edit my Profile</a>
+    </p>
+</div>
+
+@if( approved?.Count > 0)
+{
+    <div>
+        <h2> Apprved Questionnarie</h2>
+        <p>These are your questionnaires that are currently active.</p>
+
+        @foreach (var s in approved)
+        {
+            <hr />
+
+            <div>
+                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
+                <p>@s.UserVotes.Count</p>
+                <p>@s.Category.CategoryName</p>
+                <p>@s.QuestionnaireDesc</p>
+                @if (s.QuestionnaireStatus is not null)
+                {
+                    <div>
+                        @s.QuestionnaireStatus.StatusName
+                    </div>
+                    <p>
+                        @((MarkupString)s.OwnerNotes);
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (archieved?.Count > 0)
+{
+    <div>
+        <h2> archieved Questionnarie</h2>
+        <p>These are your questionnaires that are archieved.</p>
+
+        @foreach (var s in archieved)
+        {
+            <hr />
+
+            <div>
+                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
+                <p>@s.UserVotes.Count</p>
+                <p>@s.Category.CategoryName</p>
+                <p>@s.QuestionnaireDesc</p>
+                @if (s.QuestionnaireStatus is not null)
+                {
+                    <div>
+                        @s.QuestionnaireStatus.StatusName
+                    </div>
+                    <p>
+                        @((MarkupString)s.OwnerNotes);
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (pending?.Count > 0)
+{
+    <div>
+        <h2> Pending Questionnarie</h2>
+        <p>These are your questionnaires that are pending.</p>
+
+        @foreach (var s in pending)
+        {
+            <hr />
+
+            <div>
+                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
+                <p>@s.UserVotes.Count</p>
+                <p>@s.Category.CategoryName</p>
+                <p>@s.QuestionnaireDesc</p>
+                @if (s.QuestionnaireStatus is not null)
+                {
+                    <div>
+                        @s.QuestionnaireStatus.StatusName
+                    </div>
+                    <p>
+                        @((MarkupString)s.OwnerNotes);
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (rejected?.Count > 0)
+{
+    <div>
+        <h2> Rejected Questionnarie</h2>
+        <p>These are your questionnaires that are rejected.</p>
+
+        @foreach (var s in rejected)
+        {
+            <hr />
+
+            <div>
+                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
+                <p>@s.UserVotes.Count</p>
+                <p>@s.Category.CategoryName</p>
+                <p>@s.QuestionnaireDesc</p>
+                @if (s.QuestionnaireStatus is not null)
+                {
+                    <div>
+                        @s.QuestionnaireStatus.StatusName
+                    </div>
+                    <p>
+                        @((MarkupString)s.OwnerNotes);
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+
+
+@code {
+
+    private UserModal loggedInUser;
+
+
+    private List<QuestionnaireModel> submissions;
+    private List<QuestionnaireModel> approved;
+    private List<QuestionnaireModel> archieved;
+    private List<QuestionnaireModel> pending;
+    private List<QuestionnaireModel> rejected;
+
+
+
+    protected override async  Task OnInitializedAsync()
+    {
+        loggedInUser = await userData.GetUserFromAuthentication("abc-123");
+
+        var results =  await questionnnaireData.GetUserQuestionnaire(loggedInUser.Id); 
+
+        if (loggedInUser is not null && results is not null)
+        {
+            submissions = results.OrderByDescending(s => s.DateCreated).ToList();
+            approved = submissions.Where(s => s.ApprovedForRelease && s.Archived == false && s.Rejected == false).ToList();
+            archieved = submissions.Where(s => s.Archived && s.Rejected == false).ToList(); 
+            pending = submissions.Where(s => s.ApprovedForRelease == false && s.Rejected == false).ToList(); 
+            rejected = submissions.Where(s => s.Rejected).ToList();
+        }
+
+    }
+
+    private void ClosePage()
+    {
+        navManager.NavigateTo("/");
+    }
+
+
+
+}

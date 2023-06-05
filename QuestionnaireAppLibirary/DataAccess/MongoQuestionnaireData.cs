@@ -35,6 +35,21 @@ namespace QuestionnaireAppLibirary.DataAccess
         }
 
 
+        public async Task<List<QuestionnaireModel>> GetUserQuestionnaire(string userId)
+        {
+            var output = _cache.Get<List<QuestionnaireModel>>(userId);
+
+            if (output is null)
+            {
+                var result = await _questionnaire.FindAsync(s => s.Author.Id == userId);
+                output = result.ToList();
+
+                _cache.Set(userId, output, TimeSpan.FromMinutes(value:1));
+            }
+
+            return output;
+        }
+
         public async Task<List<QuestionnaireModel>> GetAllApprovedQuestionnaire()
         {
             var output = await GetAllQuesionnaire();

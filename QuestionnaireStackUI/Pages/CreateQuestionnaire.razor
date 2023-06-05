@@ -53,13 +53,20 @@
                         <div>@option.Option </div>
                     }
 
-                    <label for="question">Options</label>
-                    <input type="text" @bind="option" />
-                    <button @onclick="AddOption">Add Option</button>
-
+               
+                    @if (question.Options.Count < 4)
+                    {
+                        <label for="question">Options</label>
+                        <input type="text" @bind="option" />
+                        <button @onclick="AddOption">Add Option</button>
+                    }
                     @if(question.Options.Count == 4)
                     {
-                    <button @onclick="AddQuestion">Add Question</button>
+
+                        <label for="answer">Add answer (0 - @(question.Options.Count - 1))</label>
+                        <input type="number" min="0" max="@(question.Options.Count - 1)" @bind="question.CorrectAnswerIndex" />
+
+                    <button @onclick="AddQuestion">Add Question</button> 
                     }
                     @foreach (var q in questions)
                     {
@@ -92,6 +99,7 @@
     private QuestionModel question = new QuestionModel();
     private UserModal loggedInUser;
     private string option;
+    public int CorrectAnswerIndex { get; set; } // Index of the selected answer within the Options list
 
 
 
@@ -113,7 +121,7 @@
             {
                 Question = question.Question,
                 Options = question.Options.ToList(),
-                CorrectAnswerIndex = 0 // Set the correct answer index as needed
+                CorrectAnswerIndex = question.CorrectAnswerIndex
             });
 
         question = new QuestionModel();
