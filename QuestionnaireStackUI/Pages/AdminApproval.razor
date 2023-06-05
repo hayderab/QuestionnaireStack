@@ -1,0 +1,190 @@
+﻿@page "/AdminApproval"
+@inject IQuestionnaireData questionnarieData
+@inject IUserData userDat
+@inject NavigationManager navManager 
+
+<h3>Pending Submission</h3>
+<div> 
+    <div>
+        @submissions?.Count Submission
+    </div>
+    <div>
+        <button @onclick="ClosePage">Close Page</button>
+    </div>
+</div>
+
+@if (submissions is not null)
+{
+    foreach (var s in submissions)
+    {
+        <div>
+      
+            <div>
+              
+                <div>
+                   
+                    @if(currentEditingTitle == s.Id)
+                    {
+                        <EditForm Model="@editedTitle" OnSubmit="(() => SaveTitle(s))">
+                            <input @bind-value="editedTitle"/>
+                            <button type="submit">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <button @onclick="(() => currentEditingTitle = string.Empty)">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </span>
+                            </button>
+                        </EditForm>
+                     
+                    }
+                    else
+                    {
+                        @s.QuestionnaireTitle
+                        <span @onclick="(() => EditTitle(s))">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                            </svg>
+                        </span>
+                    }
+
+                
+                </div>
+                <div>
+                    @s.Category.CategoryName
+                </div>
+                <div>
+                    @s.Author.DisplayName
+                </div>
+
+                <div>
+                    @if (currentEditDescription == s.Id)
+                    {
+                        <EditForm Model="@editedDescription" OnSubmit="(() => SaveDescription(s))">
+                            <input @bind-value="editedDescription" />
+                            <button type="submit">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <button @onclick="(() => currentEditDescription = string.Empty)">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </span>
+                            </button>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        @s.QuestionnaireDesc
+                        <span @onclick="(() => EditDescription(s))">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                            </svg>
+                        </span>
+                    }
+                </div>
+                <div>
+                    @foreach (var question in s.Questions)
+                    {
+                        <div> @question.Question</div>
+                        @foreach (var option in question.Options)
+                        {
+                            <div>@option.Option</div>
+
+                        }
+                    }
+                </div>
+            </div>
+
+            <div>
+
+                <button @onclick="(() => ApproveSubmission(s) )">Approve</button>
+                <button @onclick="(() => RejectSubmission(s) )">Reject</button>
+            </div>
+        </div>
+    }
+}
+
+
+
+@code {
+
+    private List<QuestionnaireModel> submissions; //local copy to make upadates
+    private QuestionnaireModel editingModel;
+
+    private string currentEditingTitle = "";
+
+    private string editedTitle = "";
+    private string editedDescription = "";
+    private string currentEditDescription = "";
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        submissions = await questionnarieData.GetAllQuestionnaireForApproval();
+    }
+
+    private async  Task ApproveSubmission(QuestionnaireModel submission)
+    {
+        submission.ApprovedForRelease = true;
+        submissions.Remove(submission);
+        // might have to change to specific field update instaed of whole data.
+        await questionnarieData.UpdateQuestionnaire(submission);
+    }
+
+    private async Task RejectSubmission(QuestionnaireModel submission)
+    {
+        submission.Rejected = true;
+        submissions.Remove(submission);
+        // might have to change to specific field update instaed of whole data.
+        await questionnarieData.UpdateQuestionnaire(submission);
+    }
+
+    private void EditTitle(QuestionnaireModel model)
+    {
+        editingModel = model;
+        editedTitle = model.QuestionnaireTitle;
+        currentEditingTitle  = editedTitle;
+        currentEditDescription = "";
+    }
+
+    private async Task SaveTitle(QuestionnaireModel model)
+    {
+        currentEditingTitle = string.Empty;
+        model.QuestionnaireTitle = editedTitle;
+        await questionnarieData.UpdateQuestionnaire(model); 
+    }
+
+    private void EditDescription(QuestionnaireModel model)
+    {
+        editingModel = model;
+        editedDescription = model.QuestionnaireDesc; 
+        currentEditingTitle = "";
+        currentEditDescription = model.Id;
+    }
+
+    private async Task SaveDescription(QuestionnaireModel model)
+    {
+        currentEditDescription = string.Empty;
+        model.QuestionnaireDesc = editedDescription;
+        await questionnarieData.UpdateQuestionnaire(model);
+    }
+
+    private void ClosePage()
+    {
+        navManager.NavigateTo("/");
+    }
+}
