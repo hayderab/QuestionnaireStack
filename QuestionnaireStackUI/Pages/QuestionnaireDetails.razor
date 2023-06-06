@@ -1,6 +1,10 @@
 ﻿@page "/Details/{Id}"
 @inject IQuestionnaireData questionnaireData
+@inject IUserData userData
+
 @inject NavigationManager navManager
+@inject AuthenticationStateProvider authProvider
+
 <h3>Questionnaire Details</h3>
 <div> 
     <div> 
@@ -8,7 +12,7 @@
         {
             <div>
                 <div>
-                    <div>
+                    <div @onclick="VoteUp">
                         <div>@GetUpVoteTopText()</div>
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -69,6 +73,9 @@
     </div>
 }
 @code {
+    private UserModal loggedInUser;
+
+
     [Parameter]
     public string Id { get; set; }
 
@@ -77,11 +84,41 @@
     protected async override Task OnInitializedAsync()
     {
         questionnaire = await questionnaireData.GetQuestionnaire(Id);
+        loggedInUser = await authProvider.GerUserFromAuth(userData);
     }
 
     private void ClosePage()
     {
         navManager.NavigateTo("/"); 
+    }
+
+
+
+    private async Task VoteUp()
+    {
+        if (loggedInUser is not null)
+        {
+            //logged in
+            if (questionnaire.Author.Id == loggedInUser.Id)
+            {
+                // cannot vote on own questionnaire
+                return;
+            }
+
+            // check if you can added the id in uservotes, if its not yours questionnarie.
+            if (questionnaire.UserVotes.Add(loggedInUser.Id) == false)
+            {
+                // when you click again it removes it.
+                questionnaire.UserVotes.Remove(loggedInUser.Id);
+            }
+
+            await questionnaireData.UpVoteQuestionnaire(questionnaire.Id, loggedInUser.Id);
+
+        }
+        else
+        {
+            navManager.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
+        }
     }
 
 
@@ -93,7 +130,15 @@
         }
         else
         {
-            return "Click To";
+
+            if (questionnaire.Author.Id == loggedInUser?.Id)
+            {
+                return "Awating";
+            }
+            else
+            {
+                return "Click To";
+            }
         }
     }
 

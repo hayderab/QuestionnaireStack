@@ -158,9 +158,7 @@
     {
         categories = await categoryData.GetAllCategories();
 
-        var authSate = await authProvider.GetAuthenticationStateAsync();
-        string objectId = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        loggedInUser = await userData.GetUserFromAuthentication(objectId);
+        loggedInUser = await authProvider.GerUserFromAuth(userData);
 
     }
 

@@ -106,11 +106,11 @@ namespace QuestionnaireAppLibirary.DataAccess
                 }
 
 
-                await questionnaireInTransaction.ReplaceOneAsync(s => s.Id == questionnaireId, questionnaire);
+                await questionnaireInTransaction.ReplaceOneAsync(session, s => s.Id == questionnaireId, questionnaire);
 
 
                 var usersInTransction = db.GetCollection<UserModal>(_db.UserCollectionName);
-                var user = await _userData.GetUser(questionnaire.Author.Id);
+                var user = await _userData.GetUser(userId);
 
                 if (isUpVote)
                 {
@@ -122,7 +122,7 @@ namespace QuestionnaireAppLibirary.DataAccess
                     user.VotedOnQuestionnaire.Remove(questionnaireToRemove);
                 }
 
-                await usersInTransction.ReplaceOneAsync(u => u.Id == userId, user);
+                await usersInTransction.ReplaceOneAsync(session, u => u.Id == userId, user);
                 await session.CommitTransactionAsync();
 
                 _cache.Remove(CacheName);
@@ -154,13 +154,13 @@ namespace QuestionnaireAppLibirary.DataAccess
 
                 //questionnaire.Questions = questions;
 
-                await questionnaireInTransaction.InsertOneAsync(questionnaire);
+                await questionnaireInTransaction.InsertOneAsync(session, questionnaire);
 
 
                 var userInTranscation = db.GetCollection<UserModal>(_db.UserCollectionName);
                 var user = await _userData.GetUser(questionnaire.Author.Id);
                 user.AuthoredQuestionnaire.Add(item: new BasicQuestionnaireModel(questionnaire));
-                await userInTranscation.ReplaceOneAsync(u => u.Id == user.Id, user);
+                await userInTranscation.ReplaceOneAsync(session, u => u.Id == user.Id, user);
 
                 await session.CommitTransactionAsync();
 

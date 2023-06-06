@@ -3,6 +3,7 @@
 @inject ICategoryData categoryData
 @inject IStatusData statusdata
 @inject IQuestionnaireData questionnaireData
+@inject AuthenticationStateProvider authProvider
 @inject IUserData userData
 @inject NavigationManager navManager
 @inject ProtectedSessionStorage sessionStorage
@@ -16,41 +17,48 @@
 
 <div>
     <div> @questionnaire?.Count Questionnaire</div>
-    <div> 
-        <button class=""
-        @onclick="(() => OrderByNew(true))">New</button>
-        <button @onclick="(() => OrderByNew(false))">Popular</button>
-    </div>
-    <div>
-        <input type="text" placeholder="Search" 
-         aria-label="Search Box"
-         @oninput="((txt) => onSearchInput((string)txt.Value))" />
+    <div class="flex justify-start p-3">
+
+            <div class="px-2">
+                <input type="text" placeholder="Search" 
+                 aria-label="Search Box"
+                 @oninput="((txt) => onSearchInput((string)txt.Value))" />
+            </div>
+
+        <div>
+            <button class=""
+            @onclick="(() => OrderByNew(true))">
+                New
+            </button>
+            <button @onclick="(() => OrderByNew(false))">Popular</button>
+        </div>
     </div>
 </div>
 
 
 
-<div class="flex justify-centent items-center">
+<div class="flex justify-centent items-center ">
     <div class="w-3/5">
         @if(questionnaire is not null)
         {
             <Virtualize Items="@questionnaire" Context="item" OverscanCount="10">
 
-                <div>
-                    <div>
-                        <div>@GetUpVoteTopText(item)</div>
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                            </svg>
-
-                        </span>
-                        <div> @GetUpVoteBottomText(item)</div>
+                <div class=" shadow-md border-x-4 border-gray-100 p-4 m-2 rounded-lg shadow-slate-200">
+                    <div class="flex justify-between">
+                        <div class="cursor-pointer" @onclick="( () => VoteUp(item))">
+                            <div>@GetUpVoteTopText(item)</div>
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                </svg>
+                            </span>
+                            <div> @GetUpVoteBottomText(item)</div>
+                        </div>
                         <div>
-                            <div @onclick="(() => OpenDetails(item))">
+                            <div class="cursor-pointer" @onclick="(() => OpenDetails(item))">
                                 @item.QuestionnaireTitle
                             </div>
-                            <div @onclick="(()=> OpenDetails(item))">
+                            <div class="cursor-pointer" @onclick="(()=> OpenDetails(item))">
                                 @item.Category?.CategoryName
                             </div>
                         </div>
@@ -65,11 +73,11 @@
         }
     </div>
 
-    <div>
+    <div class="shadow-md p-4 m-2">
         @if (categories is not null)
         {
             <div>Category </div>
-            <div @onclick="(() => OnCategoryClick())" > All  </div>
+            <div class="cursor-pointer" @onclick="(() => OnCategoryClick())"> All  </div>
             @foreach(var c in categories)
             {
                 <div  @onclick="(() => OnCategoryClick(c.CategoryName))">
@@ -93,7 +101,12 @@
 </div>
 
 @code{
+
+    private UserModal loggedInUser;
+
     private List<QuestionnaireModel> questionnaire; 
+
+
 
     private List<CategoryModel> categories;
 
@@ -109,6 +122,67 @@
     {
         categories = await categoryData.GetAllCategories(); 
         statuses = await statusdata.GetAllStatus() ;
+        await LoadAndVerifyUser();
+    }
+
+
+    private async Task LoadAndVerifyUser()
+    {
+        var authSate = await authProvider.GetAuthenticationStateAsync();
+        string objectId = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+
+        if(string.IsNullOrWhiteSpace(objectId) == false)
+        {
+            loggedInUser = await userData.GetUserFromAuthentication(objectId)?? new(); // check if null, intintilate user
+
+            string firstName = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("givenname"))?.Value;
+            string lastName = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("surname"))?.Value;
+            string displayName = authSate.User.Claims.FirstOrDefault(c => c.Type.Equals("name"))?.Value;
+            string email = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("email"))?.Value;
+
+
+            bool isDirty = false;
+
+            if (objectId.Equals(loggedInUser.ObjectIndentifier) == false)
+            {
+                isDirty = true;
+                loggedInUser.ObjectIndentifier = objectId;
+            }
+            if (firstName.Equals(loggedInUser.FirstName) == false)
+            {
+                isDirty = true;
+                loggedInUser.FirstName = firstName;
+            }
+            if (lastName.Equals(loggedInUser.Lastname) == false)
+            {
+                isDirty = true;
+                loggedInUser.Lastname = lastName;
+            }
+            if (displayName.Equals(loggedInUser.DisplayName) == false)
+            {
+                isDirty = true;
+                loggedInUser.DisplayName = displayName;
+            }
+            if (email.Equals(loggedInUser.Email) == false)
+            {
+                isDirty = true;
+                loggedInUser.Email = email;
+            }
+
+            if (isDirty)
+            {
+                if (string.IsNullOrWhiteSpace(loggedInUser.Id))
+                {
+                    await userData.CreateUser(loggedInUser);
+                }
+                else
+                {
+                    await userData.UpdateUser(loggedInUser);
+                }
+            }
+
+        }
+
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
@@ -139,12 +213,12 @@
     }
 
     private async Task SaveFilterState()
-{
-    await sessionStorage.SetAsync(nameof(selectedCategory), selectedCategory);
-    await sessionStorage.SetAsync(nameof(selectedStatus), selectedStatus);
-    await sessionStorage.SetAsync(nameof(searchText), searchText);
-    await sessionStorage.SetAsync(nameof(isSortedByNew), isSortedByNew);
-}
+    {
+        await sessionStorage.SetAsync(nameof(selectedCategory), selectedCategory);
+        await sessionStorage.SetAsync(nameof(selectedStatus), selectedStatus);
+        await sessionStorage.SetAsync(nameof(searchText), searchText);
+        await sessionStorage.SetAsync(nameof(isSortedByNew), isSortedByNew);
+    }
 
     private async Task FilterQuestionnaire()
     {
@@ -215,15 +289,56 @@
 
     private string GetUpVoteTopText(QuestionnaireModel questionnaire)
     {
-        if (questionnaire.UserVotes.Count > 0)
+        if (questionnaire.UserVotes?.Count > 0)
         {
             return questionnaire.UserVotes.Count.ToString("00");
         }
         else
         {
-            return "Click To";
+            if (questionnaire.Author.Id == loggedInUser?.Id)
+            {
+                return "Awating";
+            }
+            else
+            {
+                return "Click To";
+            }
         }
     }
+
+
+    private async Task VoteUp(QuestionnaireModel _questionnaire)
+    {
+        if (loggedInUser is not null)
+        {
+            //logged in 
+            if (_questionnaire.Author.Id == loggedInUser.Id)
+            {   
+                // cannot vote on own questionnaire
+                return;
+            }
+
+            // check if you can added the id in uservotes, if its not yours questionnarie. 
+            if (_questionnaire.UserVotes.Add(loggedInUser.Id) == false)
+            {
+                // when you click again it removes it.
+                _questionnaire.UserVotes.Remove(loggedInUser.Id);
+            }
+
+            await questionnaireData.UpVoteQuestionnaire(_questionnaire.Id, loggedInUser.Id);
+
+            if(isSortedByNew == false)
+            {
+                questionnaire = questionnaire.OrderByDescending(s => s.UserVotes.Count).ThenByDescending(s => s.DateCreated).ToList();
+
+            }
+        }
+        else
+        {
+            navManager.NavigateTo("/MicrosoftIdentity/Account/SignIn", true); 
+        }
+    }
+
 
     private string GetUpVoteBottomText(QuestionnaireModel questionnaire)
     {
@@ -235,6 +350,7 @@
         {
             return "Upvote";
         }
+
     }
 
     private void OpenDetails(QuestionnaireModel questionnaire)
