@@ -1,6 +1,8 @@
 ﻿@page "/Create"
+@attribute [Authorize]
 @using QuestionnaireStackUI.Components
-@using QuestionnaireStackUI.Models;
+@using QuestionnaireStackUI.Models
+@inject AuthenticationStateProvider authProvider
 @inject ICategoryData categoryData
 @inject IQuestionnaireData questionnaireData
 @inject IUserData userData
@@ -156,8 +158,9 @@
     {
         categories = await categoryData.GetAllCategories();
 
-        //TODO - Replace with user lookup
-        loggedInUser = await userData.GetUserFromAuthentication("abc-123");
+        var authSate = await authProvider.GetAuthenticationStateAsync();
+        string objectId = authSate.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        loggedInUser = await userData.GetUserFromAuthentication(objectId);
 
     }
 

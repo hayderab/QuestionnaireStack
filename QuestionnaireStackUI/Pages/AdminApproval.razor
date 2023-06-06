@@ -1,4 +1,5 @@
 ﻿@page "/AdminApproval"
+@attribute [Authorize (Policy = "Admin")]
 @inject IQuestionnaireData questionnarieData
 @inject IUserData userDat
 @inject NavigationManager navManager 
