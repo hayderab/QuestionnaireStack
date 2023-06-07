@@ -10,35 +10,36 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>React Questionnaire</h1>
-<div>
-    <button>Questionnaire</button>
-</div>
 
-<div>
-    <div> @questionnaire?.Count Questionnaire</div>
-    <div class="flex justify-start p-3">
 
-            <div class="px-2">
-                <input type="text" placeholder="Search" 
-                 aria-label="Search Box"
-                 @oninput="((txt) => onSearchInput((string)txt.Value))" />
-            </div>
+    
 
-        <div>
-            <button class=""
-            @onclick="(() => OrderByNew(true))">
-                New
-            </button>
-            <button @onclick="(() => OrderByNew(false))">Popular</button>
-        </div>
-    </div>
-</div>
+
 
 
 
 <div class="flex justify-centent items-center ">
     <div class="w-3/5">
+        <div class="relative m-2 ">
+            <div class="flex justify-center items-center bg-white shadow-md rounded-md  py-5 m-2">
+                 <input class="rounded-md border-2" type="text" placeholder="Search" aria-label="Search Box" @oninput="((txt) => onSearchInput((string)txt.Value))" />
+            </div>
+
+            <div class="flex justify-end">
+                <button class="rounded-lg bg-blue-700 px-3 text-white" @onclick="(() => OrderByNew(true))">New</button>
+                <button class="rounded-lg bg-blue-700 px-3 text-white" @onclick="(() => OrderByNew(false))">Popular</button>
+            </div>
+        </div>
+        <div>
+             <div class=" p-4 m-2 flex border-2  bg-gray-100 rounded-md p-4 bg-g">
+                <span class="px-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </span>
+                Create Questionnaire
+            </div>
+        </div>
         @if(questionnaire is not null)
         {
             <Virtualize Items="@questionnaire" Context="item" OverscanCount="10">
@@ -73,10 +74,10 @@
         }
     </div>
 
-    <div class="shadow-md p-4 m-2">
+    <div class="shadow-md p-4 m-2 rounded-md border-y-4 border-gray-100">
         @if (categories is not null)
         {
-            <div>Category </div>
+            <div class="text-bold">Category </div>
             <div class="cursor-pointer" @onclick="(() => OnCategoryClick())"> All  </div>
             @foreach(var c in categories)
             {
@@ -88,7 +89,7 @@
 
         @if (statuses is not null)
         {
-            <div>Status </div>
+            <div class="text-bold">Status </div>
             <div @onclick="(() => OnStatusClick())"> All  </div>
             @foreach (var s in statuses)
             {
