@@ -9,84 +9,90 @@
 @inject NavigationManager navManager
 
 
-<h3>Create Questionnaire</h3>
-<div> 
-    <div> 
-        <div>
-            <button @onclick="ClosePage"> Close Page</button>
+<div class=" relative max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-2xl font-semibold mb-4">Create Questionnaire</h3>
+
+    <div>
+        <div class="flex justify-end">
+            <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300" @onclick="ClosePage">Close Page</button>
         </div>
-        @if(categories is not null)
+        @if (categories is not null)
         {
-           <EditForm Model="questionnaire">
-               <DataAnnotationsValidator/>
-               <ValidationSummary/>
-               <div>
-                    <lable for="questionnaire-text">Questionnaire</lable>
-                   <div>Test your knowledge on Different Subjects</div>
-                   <InputText id="questionnaire-text" @bind-Value="questionnaire.QuestionnaireTitle"> </InputText>
-               </div>
-               <div>
-                    <lable for="category">Category</lable>
-                    <div>Choose one Category</div>
+            <EditForm Model="questionnaire">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-4">
+                    <label for="questionnaire-text" class="text-lg font-semibold">Title</label>
+                    <div class="text-gray-500 mb-2">Add a title for the questionnaire</div>
+                    <InputText id="questionnaire-text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" @bind-Value="questionnaire.QuestionnaireTitle"></InputText>
+                </div>
+                <div class="mb-4">
+                    <label for="category" class="text-lg font-semibold">Category</label>
+                    <div class="text-gray-500 mb-2">Choose one category</div>
                     <div>
                         <MyInputRadioGroup id="category" @bind-Value="questionnaire.CategoryId">
-                        @foreach(var c in categories)
-                        {
-                            <div>
-
-                                <InputRadio Value="@c.Id" id="@c.Id"/>
-                                <labe for="@c.Id"   > @c.CategoryName - @c.CategoryDescription</labe>
-
-                             </div>
-                        }
-                       </MyInputRadioGroup>
+                            @foreach (var c in categories)
+                            {
+                                <div class="flex items-center mb-2">
+                                    <InputRadio Value="@c.Id" id="@c.Id" class="mr-2" />
+                                    <label for="@c.Id" class="text-gray-700">@c.CategoryName - @c.CategoryDescription</label>
+                                </div>
+                            }
+                        </MyInputRadioGroup>
                     </div>
-               </div>
-                <div>
-                    <lable for="questionnaire-desc">Description</lable>
-                    <div>Provide brief description about your questionnaire</div>
-                    <InputTextArea id="questionnaire-desc" @bind-Value="questionnaire.QuestionnaireDesc"> </InputTextArea>
+                </div>
+                <div class="mb-4">
+                    <label for="message" class="text-lg font-semibold">Description</label>
+                    <InputTextArea class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Provide a description about the questionnaire" rows="5" id="questionnaire-desc" @bind-Value="questionnaire.QuestionnaireDesc"></InputTextArea>
                 </div>
                 <div>
-                    <label for="question">Question</label>
-                    <input type="text" @bind="question.Question" />
+                    <label for="question" class="text-lg font-semibold">Question</label>
+                    <input class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" type="text" @bind="question.Question" />
+
                     @foreach (var option in question.Options)
                     {
-                        <div>@option.Option </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" class="mr-2" disabled />
+                            <div>@option.Option</div>
+                        </div>
                     }
 
-               
                     @if (question.Options.Count < 4)
                     {
-                        <label for="question">Options</label>
-                        <input type="text" @bind="option" />
-                        <button @onclick="AddOption">Add Option</button>
+                        <div class="flex items-center mb-2">
+                            <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2" @bind="option" />
+                            <button class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600" @onclick="AddOption">Add Option</button>
+                        </div>
                     }
-                    @if(question.Options.Count == 4)
+
+                    @if (question.Options.Count == 4)
                     {
+                        <div class="flex items-center mb-2">
+                            <label for="answer" class="text-gray-700 mr-2">Add answer (0 - @(question.Options.Count - 1))</label>
+                            <input class="w-12 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2" type="number" min="0" max="@(question.Options.Count - 1)" @bind="question.CorrectAnswerIndex" />
+                        </div>
 
-                        <label for="answer">Add answer (0 - @(question.Options.Count - 1))</label>
-                        <input type="number" min="0" max="@(question.Options.Count - 1)" @bind="question.CorrectAnswerIndex" />
-
-                    <button @onclick="AddQuestion">Add Question</button> 
+                        <button class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600" @onclick="AddQuestion">Add Question</button>
                     }
+
                     @foreach (var q in questions)
                     {
-                        <h4>@q.Question</h4>
+                        <h4 class="text-lg font-semibold mt-4 mb-2">@q.Question</h4>
                         @foreach (var option in q.Options)
                         {
                             <p>@option.Option</p>
                         }
                     }
 
-                    <button @onclick="SubmitQuestions">Submit Questions</button>
-
-
+              @*      <div class="mt-4">
+                        <button class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600" @onclick="SubmitQuestions">Submit Questions</button>
+                    </div>*@
                 </div>
-                <div> 
-                    <button type="submit" @onclick="CreateQuestionnaireData"> Create Questionnaire</button>
+                <div>
+                    <button class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 mt-4" type="submit" @onclick="CreateQuestionnaireData">Create Questionnaire</button>
                 </div>
-           </EditForm>
+            </EditForm>
         }
     </div>
 </div>
