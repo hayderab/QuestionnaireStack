@@ -5,13 +5,14 @@
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authProvider
 
-<h3>Questionnaire Details</h3>
-<div> 
-    <div> 
+<div class="relative basis-[75%] m-3 p-3 bg-white rounded-lg shadow-md">
+    <h3>Questionnaire Details</h3>
+
+    <div >
         @if(questionnaire is not null && questionnaire.Questions is not null)
         {
-            <div>
-                <div>
+            <div class="relative">
+                <div class="relative bg-white shadow-md rounded-lg m-3 p-3">
                     <div @onclick="VoteUp">
                         <div>@GetUpVoteTopText()</div>
                         <span>
@@ -24,23 +25,31 @@
                     <div>
                         <div> @questionnaire.DateCreated.ToString("MM.dd.yyyy" )</div>
                     </div>
+                    <div>
+                        <div>
+                            @questionnaire.QuestionnaireTitle <div>
+                                <div>@questionnaire.Author.DisplayName</div>
+                                <div>@questionnaire.QuestionnaireDesc</div>
+                                <div>@questionnaire.Category.CategoryName</div>
+                            </div>
+                        </div>
                 </div>
-                <div>
-                        <div>@questionnaire.QuestionnaireTitle <div>
-                        <div>@questionnaire.Author.DisplayName</div>
-                        <div>@questionnaire.QuestionnaireDesc</div>
-                        <div>@questionnaire.Category.CategoryName</div>
-                    </div>
-                </div>
-            </div> 
-                <div> @foreach(var question in questionnaire.Questions)
+                
+            </div>
+                <div classs="relative bg-white shadow-md rounded-lg m-3 p-3">
+                    @foreach(var question in questionnaire.Questions)
                     {
-                      <div> @question.Question</div>
+                        <div class="relative bg-white shadow-md rounded-lg m-3 p-3">
+                            @question.Question
                         @foreach (var option in question.Options)
                         {
-                            <div>@option.Option</div>
-
+                                <div class="relative flex bg-gray-100 items-center border-2 mb-2 rounded-lg shadow-sm m-3 p-2 ">
+                                    <input type="radio" class="mr-2" disabled />
+                                    <div>@option.Option</div>
+                                </div>
                         }
+                        </div>
+
                     }
                 </div>
             

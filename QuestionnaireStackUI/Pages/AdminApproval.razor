@@ -1,125 +1,139 @@
 ﻿@page "/AdminApproval"
-@attribute [Authorize (Policy = "Admin")]
+@attribute [Authorize(Policy = "Admin")]
 @inject IQuestionnaireData questionnarieData
 @inject IUserData userDat
-@inject NavigationManager navManager 
+@inject NavigationManager navManager
 
-<h3>Pending Submission</h3>
-<div> 
-    <div>
-        @submissions?.Count Submission
-    </div>
-    <div>
-        <button @onclick="ClosePage">Close Page</button>
-    </div>
-</div>
 
-@if (submissions is not null)
-{
-    foreach (var s in submissions)
-    {
+<div class="basis-[75%] relative bg-gray-100 p-4 rounded-lg">
+
+    <h3 class="text-xl font-bold mb-4">Pending Submission</h3>
+
+    <div class="flex items-center justify-between mb-4">
+        <div class="text-lg font-semibold">
+            @submissions?.Count Submission
+        </div>
         <div>
-      
-            <div>
-              
-                <div>
-                   
-                    @if(currentEditingTitle == s.Id)
+            <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300" @onclick="ClosePage">Close Page</button>
+        </div>
+    </div>
+
+    @if (submissions is not null)
+    {
+        @foreach (var s in submissions)
+        {
+            <div class="bg-white rounded-lg shadow-lg p-4 mb-4">
+
+                <div class="p-2 mb-4">
+
+                    @if (currentEditingTitle == s.Id)
                     {
                         <EditForm Model="@editedTitle" OnSubmit="(() => SaveTitle(s))">
-                            <input @bind-value="editedTitle"/>
-                            <button type="submit">
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                    </svg>
-                                </span>
-                            </button>
-
-                            <button @onclick="(() => currentEditingTitle = string.Empty)">
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </span>
-                            </button>
+                            <div class="flex items-center justify-between">
+                                <input @bind-value="editedTitle" class="w-2/3 px-2 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-300" />
+                                <div class="flex items-center">
+                                    <button class="bg-gray-400 rounded-md p-2" type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
+                                    </button>
+                                    <button @onclick="(() => currentEditingTitle = string.Empty)" class="bg-red-400 rounded-md p-2 ml-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </EditForm>
-                     
                     }
                     else
                     {
-                        @s.QuestionnaireTitle
-                        <span @onclick="(() => EditTitle(s))">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                            </svg>
-                        </span>
+                        <div class="flex items-center">
+                            <span class="mr-2 text-lg font-medium">
+                                @s.QuestionnaireTitle
+                            </span>
+                            <span @onclick="(() => EditTitle(s))" class="bg-white shadow-md rounded-lg p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                </svg>
+                            </span>
+                        </div>
                     }
 
-                
-                </div>
-                <div>
-                    @s.Category.CategoryName
-                </div>
-                <div>
-                    @s.Author.DisplayName
                 </div>
 
-                <div>
+                <div class="mb-4">
+                    <div class="text-gray-600 font-medium mb-2">Category:</div>
+                    <div>@s.Category.CategoryName</div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-gray-600 font-medium mb-2">Author:</div>
+                    <div>@s.Author.DisplayName</div>
+                </div>
+
+                <div class="mb-4">
                     @if (currentEditDescription == s.Id)
                     {
                         <EditForm Model="@editedDescription" OnSubmit="(() => SaveDescription(s))">
-                            <input @bind-value="editedDescription" />
-                            <button type="submit">
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                    </svg>
-                                </span>
-                            </button>
-
-                            <button @onclick="(() => currentEditDescription = string.Empty)">
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </span>
-                            </button>
+                            <div class="flex items-center justify-between">
+                                <input class="w-2/3 px-2 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-300" @bind-value="editedDescription" row="5"/>
+                                <div class="flex items-center">
+                                    <button type="submit" class="bg-gray-400 rounded-md p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
+                                    </button>
+                                    <button @onclick="(() => currentEditDescription = string.Empty)" class="bg-red-400 rounded-md p-2 ml-2 hover:bg-gray-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </EditForm>
                     }
                     else
                     {
-                        @s.QuestionnaireDesc
-                        <span @onclick="(() => EditDescription(s))">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                            </svg>
-                        </span>
+                        <div class="flex items-center">
+                            <span class="mr-2 text-lg font-medium">
+                                @s.QuestionnaireDesc
+                            </span>
+                            <span @onclick="(() => EditDescription(s))" class="bg-white shadow-md rounded-lg p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                </svg>
+                            </span>
+                        </div>
                     }
                 </div>
+
                 <div>
                     @foreach (var question in s.Questions)
                     {
-                        <div> @question.Question</div>
-                        @foreach (var option in question.Options)
-                        {
-                            <div>@option.Option</div>
-
-                        }
+                        <div class="mb-2">
+                            <div class="font-medium mb-1">@question.Question</div>
+                            @foreach (var option in question.Options)
+                            {
+                                <div class="flex items-center">
+                                    <input type="radio" class="mr-2" disabled />
+                                    <div>@option.Option</div>
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
-            </div>
 
-            <div>
+                <div class="flex justify-end mt-4">
+                    <button @onclick="(() => ApproveSubmission(s))" class="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600">Approve</button>
+                    <button @onclick="(() => RejectSubmission(s))" class="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 ml-2">Reject</button>
+                </div>
 
-                <button @onclick="(() => ApproveSubmission(s) )">Approve</button>
-                <button @onclick="(() => RejectSubmission(s) )">Reject</button>
             </div>
-        </div>
+        }
     }
-}
 
-
+</div>
 
 @code {
 
@@ -138,7 +152,7 @@
         submissions = await questionnarieData.GetAllQuestionnaireForApproval();
     }
 
-    private async  Task ApproveSubmission(QuestionnaireModel submission)
+    private async Task ApproveSubmission(QuestionnaireModel submission)
     {
         submission.ApprovedForRelease = true;
         submissions.Remove(submission);
@@ -158,7 +172,7 @@
     {
         editingModel = model;
         editedTitle = model.QuestionnaireTitle;
-        currentEditingTitle  = editedTitle;
+        currentEditingTitle = model.Id ;
         currentEditDescription = "";
     }
 
@@ -166,13 +180,13 @@
     {
         currentEditingTitle = string.Empty;
         model.QuestionnaireTitle = editedTitle;
-        await questionnarieData.UpdateQuestionnaire(model); 
+        await questionnarieData.UpdateQuestionnaire(model);
     }
 
     private void EditDescription(QuestionnaireModel model)
     {
         editingModel = model;
-        editedDescription = model.QuestionnaireDesc; 
+        editedDescription = model.QuestionnaireDesc;
         currentEditingTitle = "";
         currentEditDescription = model.Id;
     }

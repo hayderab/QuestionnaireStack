@@ -7,136 +7,139 @@
 @inject NavigationManager navManager
 
 
-<h1>Profile</h1>
 
-<div>
-    <div>
-        <button @onclick="ClosePage"> Close Page</button>
+
+<div class=" basis-[75%] relative flex flex-col">
+    <div class="p-4 m-3 bg-white rounded-lg shadow-lg">
+
+        <div class="flex justify-end">
+            <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300" @onclick="ClosePage">Close Page</button>
+        </div>
+
+        <h2 class="text-2xl py-2 font-bold">My Account</h2>
+
+        <div class="my-4 py-2 ">
+            <h1 class="text-xl font-bold">Profile</h1>
+            <!-- <p class="p-2">@loggedInUser.DisplayName?</p> -->
+        </div>
+
+        <a href="/MicrosoftIdentity/Account/EditProfile" class="inline-flex items-center gap-x-2 rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300">
+            <span class="font-medium">Edit Profile</span>
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
+            </span>
+        </a>
+
     </div>
+
+    <div class="realative  basis-[75%] bg-white shadow-md rounded-lg p-2 m-3 ">
+        <div class="flex justify-end">
+            <button class="flex bg-black text-white items-center gap-x-3 focus:outline-none">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Create Questionnaire </span>
+
+            </button>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                    <th scope="col" class="px-4 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Title</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Category</th>
+
+                    <th scope="col" class="px-12 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Status</th>
+
+                    <th scope="col" class="px-4 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Description</th>
+
+                    <th scope="col" class="px-4 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Date Created</th>
+
+                    <th scope="col" class="px-4 py-3.5 text-left text-sm font-normal text-gray-500 rtl:text-right dark:text-gray-400">Votes</th>
+
+
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @{
+                    var questionnaireLists = new Dictionary<string, List<QuestionnaireModel>>
+                {
+                { "Approved", approved },
+                { "Archived", archived },
+                { "Pending", pending },
+                { "Rejected", rejected }
+                };
+                }
+
+                @foreach (var kvp in questionnaireLists)
+                {
+                    var state = kvp.Key;
+                    var questionnaires = kvp.Value;
+
+                    @if (questionnaires?.Count > 0)
+                    {
+                        @*  <h2>@state Questionnaire</h2>
+                <p>These are your questionnaires that are @state.ToLower().</p>*@
+
+                        @foreach (var s in questionnaires)
+                        {
+
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-4 text-sm font-medium">
+                                    <div>
+                                        <h2 class="font-medium text-gray-800 dark:text-white">@s.QuestionnaireTitle</h2>
+                                        @*                                            <p class="text-sm font-normal text-gray-600 dark:text-gray-400">@s.Author.</p>
+                            *@
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                    <div>
+                                        <p class="text-gray-500 dark:text-gray-400">@s.Category.CategoryName</p>
+                                    </div>
+                                </td>
+
+                                <td class="whitespace-nowrap px-12 py-4 text-sm font-medium">
+                                    <div class="inline gap-x-2 rounded-full bg-emerald-100/60 px-3 py-1 text-sm font-normal text-emerald-500 dark:bg-gray-800">@state</div>
+                                </td>
+
+                                <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                    <div>
+                                        <h4 class="text-gray-700 dark:text-gray-200">@s.QuestionnaireDesc</h4>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                    <div class="flex items-center">@s.DateCreated.ToString("MM.dd.yyyy")</div>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                    <div class="text-gray">@s.UserVotes.Count</div>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-4 text-sm">
+                                    <button class="rounded-lg bg-white px-1 py-1 text-gray-500 transition-colors duration-200 hover:bg-gray-100 dark:text-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+
+            </tbody>
+        </table>
+
+
+
+
+    </div>
+
 </div>
 
-<div> 
-    <h2> My Account </h2>
-    <p>
-        <a href="/MicrosoftIdentity/Account/EditProfile">Edit my Profile</a>
-    </p>
-</div>
 
-@if( approved?.Count > 0)
-{
-    <div>
-        <h2> Apprved Questionnarie</h2>
-        <p>These are your questionnaires that are currently active.</p>
-
-        @foreach (var s in approved)
-        {
-            <hr />
-
-            <div>
-                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
-                <p>@s.UserVotes.Count</p>
-                <p>@s.Category.CategoryName</p>
-                <p>@s.QuestionnaireDesc</p>
-                @if (s.QuestionnaireStatus is not null)
-                {
-                    <div>
-                        @s.QuestionnaireStatus.StatusName
-                    </div>
-                    <p>
-                        @((MarkupString)s.OwnerNotes);
-                    </p>
-                }
-            </div>
-        }
-    </div>
-}
-
-@if (archieved?.Count > 0)
-{
-    <div>
-        <h2> archieved Questionnarie</h2>
-        <p>These are your questionnaires that are archieved.</p>
-
-        @foreach (var s in archieved)
-        {
-            <hr />
-
-            <div>
-                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
-                <p>@s.UserVotes.Count</p>
-                <p>@s.Category.CategoryName</p>
-                <p>@s.QuestionnaireDesc</p>
-                @if (s.QuestionnaireStatus is not null)
-                {
-                    <div>
-                        @s.QuestionnaireStatus.StatusName
-                    </div>
-                    <p>
-                        @((MarkupString)s.OwnerNotes);
-                    </p>
-                }
-            </div>
-        }
-    </div>
-}
-
-@if (pending?.Count > 0)
-{
-    <div>
-        <h2> Pending Questionnarie</h2>
-        <p>These are your questionnaires that are pending.</p>
-
-        @foreach (var s in pending)
-        {
-            <hr />
-
-            <div>
-                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
-                <p>@s.UserVotes.Count</p>
-                <p>@s.Category.CategoryName</p>
-                <p>@s.QuestionnaireDesc</p>
-                @if (s.QuestionnaireStatus is not null)
-                {
-                    <div>
-                        @s.QuestionnaireStatus.StatusName
-                    </div>
-                    <p>
-                        @((MarkupString)s.OwnerNotes);
-                    </p>
-                }
-            </div>
-        }
-    </div>
-}
-
-@if (rejected?.Count > 0)
-{
-    <div>
-        <h2> Rejected Questionnarie</h2>
-        <p>These are your questionnaires that are rejected.</p>
-
-        @foreach (var s in rejected)
-        {
-            <hr />
-
-            <div>
-                <p>@s.DateCreated.ToString("MM.dd.yyyy")</p>
-                <p>@s.UserVotes.Count</p>
-                <p>@s.Category.CategoryName</p>
-                <p>@s.QuestionnaireDesc</p>
-                @if (s.QuestionnaireStatus is not null)
-                {
-                    <div>
-                        @s.QuestionnaireStatus.StatusName
-                    </div>
-                    <p>
-                        @((MarkupString)s.OwnerNotes);
-                    </p>
-                }
-            </div>
-        }
-    </div>
-}
 
 
 @code {
@@ -146,24 +149,24 @@
 
     private List<QuestionnaireModel> submissions;
     private List<QuestionnaireModel> approved;
-    private List<QuestionnaireModel> archieved;
+    private List<QuestionnaireModel> archived;
     private List<QuestionnaireModel> pending;
     private List<QuestionnaireModel> rejected;
 
 
 
-    protected override async  Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         loggedInUser = await authProvider.GerUserFromAuth(userData);
 
-        var results =  await questionnnaireData.GetUserQuestionnaire(loggedInUser.Id); 
+        var results = await questionnnaireData.GetUserQuestionnaire(loggedInUser.Id);
 
         if (loggedInUser is not null && results is not null)
         {
             submissions = results.OrderByDescending(s => s.DateCreated).ToList();
             approved = submissions.Where(s => s.ApprovedForRelease && s.Archived == false && s.Rejected == false).ToList();
-            archieved = submissions.Where(s => s.Archived && s.Rejected == false).ToList(); 
-            pending = submissions.Where(s => s.ApprovedForRelease == false && s.Rejected == false).ToList(); 
+            archived = submissions.Where(s => s.Archived && s.Rejected == false).ToList();
+            pending = submissions.Where(s => s.ApprovedForRelease == false && s.Rejected == false).ToList();
             rejected = submissions.Where(s => s.Rejected).ToList();
         }
 
