@@ -1,6 +1,8 @@
 ﻿
 namespace QuestionnaireAppLibirary.Models
-{
+{  
+
+    // TODO : Create Id, Saperate table
     public class QuestionModel
     {
         public string Question { get; set; }
