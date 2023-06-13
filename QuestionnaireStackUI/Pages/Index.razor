@@ -20,7 +20,7 @@
     <div class="flex-none p-3">
         <div class="flex justify-center items-center">
             <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-                Create and Attempt Questionnaires
+                Create and Attempt Quzzies
             </h1>
         </div>
     </div>
@@ -49,8 +49,8 @@
 
     <div class="flex justify-between lg:flex-row flex-col-reverse md:flex-row">
 
-        <div class="grow relative">
-            <div class="bg-g m-2 flex rounded-md border-2 bg-gray-100 p-4">
+        <div class="grow relative ">
+            <div class="bg-g m-2 flex rounded-md border-2 bg-gray-100 p-4 cursor-pointer hover:bg-slate-100" @onclick="() =>CreateQuestionnaire()">
                 <span class="px-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -61,8 +61,8 @@
             @if (questionnaire is not null)
             {
                 <Virtualize Items="@questionnaire" Context="item" OverscanCount="10">
-                    <div class="relative m-3 flex justify-between rounded-lg bg-white p-4 shadow-lg">
-                        <div class="m-3 p-2 w-9 rounded-lg p-2 shadow-lg cursor-pointer" @onclick="( () => VoteUp(item))">
+                    <div class="relative m-3 flex justify-between rounded-lg bg-white p-4 shadow-lg ">
+                        <div class=" flex  flex-col items-center m-3 rounded-lg p-2 cursor-pointer" @onclick="( () => VoteUp(item))">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                             </svg>
@@ -74,7 +74,7 @@
                             </svg>
                         </div>
 
-                        <div>
+                        <div class="flex justify-center items-center flex-col">
                             <div class="cursor-pointer font-bold text-xl" @onclick="(() => OpenDetails(item))">@item.QuestionnaireTitle</div>
                             <div class="cursor-pointer text-gray-500" @onclick="(()=> OpenDetails(item))">@item.Category?.CategoryName</div>
                         </div>
@@ -91,7 +91,7 @@
 
         <div class="relative place-self-auto">
             <div>
-                <div class="m-3 rounded-md bg-white p-4 shadow-lg">
+                <div class="m-3 rounded-md bg-white p-4 shadow-lg border-l-8 border-black">
                     @if (categories is not null)
                     {
                         <div class="font-bold">Category</div>
@@ -102,7 +102,7 @@
                         }
                     }
                 </div>
-                <div class="m-3 rounded-md bg-white p-4 shadow-lg">
+                <div class="m-3 rounded-md bg-white p-4 shadow-lg border-l-8 border-black">
                     @if (statuses is not null)
                     {
                         <div class="font-bold">Status</div>
@@ -376,5 +376,10 @@
     {
         navManager.NavigateTo($"/Details/{questionnaire.Id}");
     }
+  
 
+    private void CreateQuestionnaire()
+    {
+        navManager.NavigateTo("/Create");
+    }
 }

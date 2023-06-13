@@ -36,7 +36,7 @@
 
     <div class="realative  basis-[75%] bg-white shadow-md rounded-lg p-2 m-3 ">
         <div class="flex justify-end">
-            <button class="flex bg-black text-white items-center gap-x-3 focus:outline-none">
+            <button class="flex bg-black text-white items-center gap-x-3 focus:outline-none" @onclick="() =>CreateQuestionnaire()">
 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -177,6 +177,10 @@
         navManager.NavigateTo("/");
     }
 
+    private void CreateQuestionnaire()
+    {
+        navManager.NavigateTo("/Create");
+    }
 
 
 }
