@@ -2,16 +2,12 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Rewrite;
 using QuestionnaireStackUI;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.ConfigureServices();
 
 var app = builder.Build();
-
-// Set the environment explicitly
-app.Environment.EnvironmentName = "Production";
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -29,15 +25,15 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseRewriter(new RewriteOptions().Add(
-    context =>
-    {
-        if (context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignedOut")
+app.UseRewriter( new RewriteOptions().Add(
+        context =>
         {
-            context.HttpContext.Response.Redirect("/");
+            if(context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignedOut")
+            {
+                context.HttpContext.Response.Redirect("/");
+            }
         }
-    }
-));
+    ));
 
 app.MapControllers();
 app.MapBlazorHub();
