@@ -6,6 +6,7 @@
 @inject AuthenticationStateProvider authProvider
 
 <div class="relative basis-[75%] m-3 p-3 bg-white rounded-lg shadow-md">
+    <title>Multiple Choise Questions </title>
     <h3>Questionnaire Details</h3>
     <div class="flex justify-end ">
         <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300" @onclick="ClosePage">Close Page </button>
@@ -46,14 +47,18 @@
 
                             @foreach (var (option, optionIndex) in question.Options.Select((opt, idx) => (opt, idx)))
                             {
-                                <div @onclick="() => selectedAnswerIndices[questionIndex] = optionIndex">
-                                    <div class="ring-2 ring-gray-500 relative flex bg-gray-100 items-center border-2 mb-2 rounded-lg shadow-sm m-3 p-2 @(selectedAnswerIndices.TryGetValue(questionIndex, out int selectedOptionIndex) && selectedOptionIndex == optionIndex ? "bg-blue-400" : "") ">
-                                        <div id="answer_(@questionIndex,@optionIndex)"  class="mr-2"  >
-                                            <div class="px-3 py-2 rounded-lg cursor-pointer ">
-                                                @option.Option
+                                <div @onclick="() => SetSelectedAnswerIndex(questionIndex, optionIndex)">
+                                
+                                        <div class="shadow-inner relative flex bg-gray-100 items-center border-2 mb-2 rounded-lg shadow-sm m-3 p-2 @(GetOptionClass(questionIndex, optionIndex))">
+                                            <div id="answer_(@questionIndex,@optionIndex)" class="mr-2">
+                                                <div class="px-3 py-2 rounded-lg cursor-pointer ">
+                                                    @option.Option
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    
+
+                                    
                                 </div>
 
                             }
@@ -73,7 +78,7 @@
         {
             <h2>Results:</h2>
             <p>Overall Score: @CalculateOverallScore() / @questionnaire.Questions.Count</p>
-            @foreach (var (question, questionIndex) in questionnaire.Questions.Select((q, idx) => (q, idx)))
+           @* @foreach (var (question, questionIndex) in questionnaire.Questions.Select((q, idx) => (q, idx)))
             {
                 <p>
                     @question.Question<br />
@@ -81,7 +86,7 @@
                     Correct Answer: @question.Options[question.CorrectAnswerIndex].Option
                     <span class="@GetAnswerStatusClass(question, selectedAnswerIndices[questionIndex])">@GetAnswerStatusText(question, selectedAnswerIndices[questionIndex])</span>
                 </p>
-            }
+            }*@
         }
 
 
@@ -119,6 +124,21 @@
 
     private Dictionary<int, int> selectedAnswerIndices = new Dictionary<int, int>();
 
+
+
+    private void SetSelectedAnswerIndex(int questionIndex, int optionIndex)
+    {
+
+        if (selectedAnswerIndices.ContainsKey(questionIndex))
+        {
+            selectedAnswerIndices[questionIndex] = optionIndex;
+        }
+        else
+        {
+            selectedAnswerIndices.Add(questionIndex, optionIndex);
+        }
+    }
+
     protected async override Task OnInitializedAsync()
     {
         questionnaire = await questionnaireData.GetQuestionnaire(Id);
@@ -133,8 +153,8 @@
 
 
 
-    
-   
+
+
 
     private async Task VoteUp()
     {
@@ -233,6 +253,35 @@
         return selectedOptionIndex == question.CorrectAnswerIndex ? "Correct" : "Incorrect";
     }
 
+
+    /**
+     * CHange colour of option when its selected, user can only select one option at a time.
+     * */
+    private string GetOptionClass(int questionIndex, int optionIndex)
+    {
+        int selectedOptionIndex;
+
+        if (showResults)
+        {
+            var question = questionnaire.Questions.ElementAtOrDefault(questionIndex);
+            if (question != null)
+            {
+                if (optionIndex == question.CorrectAnswerIndex)
+                {
+                    return "bg-green-200"; // Apply green background to correct option
+                }
+                else if (selectedAnswerIndices.TryGetValue(questionIndex, out selectedOptionIndex) && selectedOptionIndex == optionIndex)
+                {
+                    return "bg-red-200"; // Apply red background to incorrect option
+                }
+            }
+        }
+        if (selectedAnswerIndices.TryGetValue(questionIndex, out selectedOptionIndex) && selectedOptionIndex == optionIndex)
+        {
+            return "selected-option"; // Apply custom style to selected option
+        }
+        return "";
+    }
 
 
 }
